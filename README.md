@@ -1,6 +1,7 @@
-# 📚 Thumbstack PBM Backend
+# 📚 AKSHARVAULT Thumbstack PBM Backend
 
-Backend service for the **Thumbstack Personal Book Management (PBM) System**.
+Backend service for the **AKSHARVAULT: Personal Book Management (PBM) System**.
+
 This API allows users to **register, authenticate, and manage their personal book collection**, including **categories, authors, and books** with full CRUD functionality.
 
 ---
@@ -13,17 +14,20 @@ This API allows users to **register, authenticate, and manage their personal boo
 - **Mongoose**
 - **JWT Authentication**
 - **REST API Architecture**
+- **Cloudinary (Image Upload)**
+- **Multer (File Upload)**
+- **Nodemailer (Email Service)**
 
 ---
 
-## 📂 Project Structure
+# 📂 Project Structure
 
 ```
 thumbstack_pbm_backend
 │
 ├── src
 │   │
-│   ├── controllers                # Handles request logic and responses
+│   ├── controllers
 │   │   ├── admin.controller.js
 │   │   ├── auth.controller.js
 │   │   ├── author.controller.js
@@ -31,136 +35,89 @@ thumbstack_pbm_backend
 │   │   ├── category.controller.js
 │   │   └── cors.controller.js
 │   │
-│   ├── database                   # Database related files
+│   ├── database
 │   │   │
-│   │   ├── model                  # Mongoose model definitions
+│   │   ├── model
 │   │   │   ├── author.model.js
 │   │   │   ├── book.model.js
 │   │   │   ├── category.model.js
 │   │   │   ├── cors.model.js
 │   │   │   └── user.model.js
 │   │   │
-│   │   ├── schema                 # Schema structure for MongoDB collections
+│   │   ├── schema
 │   │   │   ├── author.schema.js
 │   │   │   ├── book.schema.js
 │   │   │   ├── category.schema.js
 │   │   │   ├── cors.schema.js
 │   │   │   └── user.schema.js
 │   │   │
-│   │   └── index.js               # MongoDB connection configuration
+│   │   └── index.js
 │   │
-│   ├── routes                     # API route definitions
+│   ├── routes
 │   │   ├── auth.route.js
 │   │   ├── author.route.js
 │   │   ├── book.route.js
 │   │   ├── category.route.js
-│   │   └── index.route.js         # Combines all routes
+│   │   └── index.route.js
 │   │
-│   ├── utility                    # Helper utilities
+│   ├── utility
 │   │   │
-│   │   ├── mail                   # Email related utilities
+│   │   ├── mail
 │   │   │   ├── mailMessage.js
 │   │   │   └── sendmail.js
 │   │   │
-│   │   └── middleware             # Application middlewares
+│   │   └── middleware
 │   │       ├── auth.middleware.js
 │   │       ├── multer.middleware.js
 │   │       └── cloudinary.js
 │   │
-│   ├── app.js                     # Express app configuration
-│   └── index.js                   # Application entry point
+│   ├── app.js
+│   └── index.js
 │
-├── .env                           # Environment variables
-├── .gitignore                     # Files ignored by Git
-├── package.json                   # Project dependencies
+├── .env
+├── .gitignore
+├── package.json
 ├── package-lock.json
-└── README.md                      # Project documentation
+└── README.md
 ```
 
 ---
 
-## 🧩 Architecture Overview
+# 🧩 Architecture Overview
 
-The backend follows a **layered architecture**:
-
-**Route → Controller → Model → Schema → Database**
-
-### 1️⃣ Routes
-
-Define API endpoints and map them to controllers.
-
-Example:
+The backend follows a **layered architecture**.
 
 ```
-POST /api/auth/register
-GET /api/books
-POST /api/category
+Route → Controller → Model → Schema → Database
 ```
 
----
+### Routes
 
-### 2️⃣ Controllers
+Define API endpoints and connect them to controllers.
 
-Controllers handle the **business logic** and process incoming requests.
+### Controllers
 
-Example:
+Handle request processing and business logic.
 
-- User authentication
-- Creating books
-- Managing authors
-- Managing categories
+### Models
 
----
+Interact with MongoDB collections using Mongoose.
 
-### 3️⃣ Models
+### Schemas
 
-Models interact with **MongoDB collections** using Mongoose.
+Define the structure of documents stored in MongoDB.
 
-They represent database entities such as:
+### Middleware
 
-- Users
-- Books
-- Authors
-- Categories
+Reusable logic such as authentication and file uploads.
+
+### Utilities
+
+Helper services like email sending and template generation.
 
 ---
 
-### 4️⃣ Schemas
-
-Schemas define the **structure of documents stored in MongoDB**.
-
-Example fields:
-
-- Book title
-- Author reference
-- Category reference
-- User details
-
----
-
-### 5️⃣ Middleware
-
-Middleware handles reusable logic such as:
-
-- Authentication verification
-- File uploads
-- Image storage with Cloudinary
-
----
-
-### 6️⃣ Utilities
-
-Utility functions provide reusable services such as:
-
-- Sending emails
-- Mail message templates
-- Other helper functions
-
----
-
-## 🔄 Request Flow
-
-A typical API request flows like this:
+# 🔄 Request Flow
 
 ```
 Client Request
@@ -181,14 +138,14 @@ Schema
 MongoDB Database
       │
       ▼
-Response sent back to Client
+Response to Client
 ```
 
-This structure ensures **clean code separation and maintainability**.
+---
 
 # ⚙️ Installation & Setup
 
-### 1️⃣ Clone the Repository
+## 1️⃣ Clone the Repository
 
 ```
 git clone https://github.com/yashitag1409/thumbstack_pbm_backend.git
@@ -197,7 +154,7 @@ cd thumbstack_pbm_backend
 
 ---
 
-### 2️⃣ Install Dependencies
+## 2️⃣ Install Dependencies
 
 ```
 npm install
@@ -205,7 +162,7 @@ npm install
 
 ---
 
-### 3️⃣ Create Environment File
+## 3️⃣ Create Environment File
 
 Create a `.env` file in the root directory.
 
@@ -215,23 +172,30 @@ Example:
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+CLOUDINARY_NAME=your_cloudinary_name
+CLOUDINARY_KEY=your_cloudinary_key
+CLOUDINARY_SECRET=your_cloudinary_secret
+MAIL_USER=your_email
+MAIL_PASS=your_email_password
 ```
 
 ---
 
-### 4️⃣ Start the Server
+## 4️⃣ Start the Server
+
+Development:
 
 ```
 npm run dev
 ```
 
-or
+Production:
 
 ```
 npm start
 ```
 
-Server will run on:
+Server runs at:
 
 ```
 http://localhost:5000
@@ -241,58 +205,62 @@ http://localhost:5000
 
 # 🔐 Authentication Flow
 
-The backend uses **JWT-based authentication**.
+JWT is used for authentication.
 
-### Step 1 – Register User
+## Register User
 
 ```
 POST /api/auth/register
 ```
 
-Request Body
+### Required Fields
+
+| Field       | Type   | Description                |
+| ----------- | ------ | -------------------------- |
+| name        | String | User name                  |
+| email       | String | Unique email               |
+| password    | String | Minimum 6 characters       |
+| contact     | String | User contact number        |
+| countryCode | String | Country code (default +91) |
+
+### Example Request
 
 ```
 {
-  "name": "Yashit",
-  "email": "yashit@example.com",
-  "password": "password123"
+ "name":"Yashit Agrawal",
+ "email":"yashit@example.com",
+ "password":"password123",
+ "contact":"9876543210",
+ "countryCode":"+91"
 }
-```
-
-Response
-
-```
-User created successfully
 ```
 
 ---
 
-### Step 2 – Login User
+## Login User
 
 ```
 POST /api/auth/login
 ```
 
-Request Body
+### Example Request
 
 ```
 {
-  "email": "yashit@example.com",
-  "password": "password123"
+ "email":"yashit@example.com",
+ "password":"password123"
 }
 ```
 
-Response
+### Response
 
 ```
 {
-  "token": "JWT_TOKEN"
+ "token":"JWT_TOKEN"
 }
 ```
 
-This token must be used in protected APIs.
-
-Header:
+Use token in headers:
 
 ```
 Authorization: Bearer JWT_TOKEN
@@ -300,271 +268,194 @@ Authorization: Bearer JWT_TOKEN
 
 ---
 
-# 📚 Application Workflow
+# 📚 Category Management
 
-The typical workflow of the system:
+Categories help organize books.
 
-1. User registers an account
-2. User logs in and receives a JWT token
-3. User creates **categories**
-4. User creates **authors**
-5. User adds **books**
-6. User can update or delete any resource
-7. User can fetch lists of categories, authors, and books
-
----
-
-# 📁 Category APIs
-
-### Create Category
+## Create Category
 
 ```
 POST /api/categories
 ```
 
-Request
+### Required Fields
 
-```
-{
-  "name": "Fiction"
-}
-```
+| Field | Type     | Description     |
+| ----- | -------- | --------------- |
+| name  | String   | Category name   |
+| user  | ObjectId | Creator user ID |
 
----
+### Optional Fields
 
-### Get All Categories
-
-```
-GET /api/categories
-```
-
----
-
-### Update Category
-
-```
-PUT /api/categories/:id
-```
+| Field           | Description             |
+| --------------- | ----------------------- |
+| slug            | URL friendly name       |
+| description     | Category description    |
+| isSystemDefault | Default system category |
 
 ---
 
-### Delete Category
+# ✍️ Author Management
 
-```
-DELETE /api/categories/:id
-```
-
----
-
-# ✍️ Author APIs
-
-### Create Author
+## Create Author
 
 ```
 POST /api/authors
 ```
 
-Request
+### Required Fields
 
-```
-{
-  "name": "J.K. Rowling"
-}
-```
+| Field | Type     | Description     |
+| ----- | -------- | --------------- |
+| name  | String   | Author name     |
+| user  | ObjectId | Creator user ID |
 
----
+### Optional Fields
 
-### Get All Authors
-
-```
-GET /api/authors
-```
-
----
-
-### Update Author
-
-```
-PUT /api/authors/:id
-```
+| Field        | Description      |
+| ------------ | ---------------- |
+| biography    | Author biography |
+| website      | Author website   |
+| profileImage | Author image     |
 
 ---
 
-### Delete Author
+# 📖 Book Management
 
-```
-DELETE /api/authors/:id
-```
+Books are the core entity.
 
----
-
-# 📖 Book APIs
-
-### Add Book
+## Add Book
 
 ```
 POST /api/books
 ```
 
-Request
+### Required Fields
+
+| Field       | Type     | Description      |
+| ----------- | -------- | ---------------- |
+| user        | ObjectId | Owner user ID    |
+| title       | String   | Book title       |
+| description | String   | Book description |
+
+### Optional Fields
+
+| Field          | Description                        |
+| -------------- | ---------------------------------- |
+| category       | Reference category                 |
+| customCategory | Custom category name               |
+| author         | Reference author                   |
+| customAuthor   | Custom author                      |
+| tags           | Book tags                          |
+| numberOfPages  | Total pages                        |
+| pages          | Array of pages                     |
+| thumbNail      | Book image                         |
+| status         | reading / want_to_read / completed |
+| isFavorite     | Favorite book                      |
+
+---
+
+# 📄 Book Pages Structure
 
 ```
 {
-  "title": "Harry Potter",
-  "authorId": "AUTHOR_ID",
-  "categoryId": "CATEGORY_ID",
-  "publishedYear": 2001
+ "pages":[
+   {
+     "page_url":"https://example.com/page1.png",
+     "page_no":1
+   },
+   {
+     "page_url":"https://example.com/page2.png",
+     "page_no":2
+   }
+ ]
 }
 ```
 
 ---
 
-### Get All Books
+# ⭐ Book Status
+
+Allowed values:
 
 ```
-GET /api/books
+reading
+want_to_read
+completed
 ```
 
----
-
-### Get Book By ID
+Default:
 
 ```
-GET /api/books/:id
-```
-
----
-
-### Update Book
-
-```
-PUT /api/books/:id
+want_to_read
 ```
 
 ---
 
-### Delete Book
+# 🌐 CORS Management
 
-```
-DELETE /api/books/:id
-```
+Admin can manage allowed origins.
 
----
+### Required Fields
 
-# 🔎 Filtering & Searching
+| Field   | Type     | Description          |
+| ------- | -------- | -------------------- |
+| origin  | String   | Allowed frontend URL |
+| addedBy | ObjectId | Admin ID             |
 
-Books can be filtered using query parameters.
+### Optional Fields
 
-Example:
-
-```
-GET /api/books?author=AUTHOR_ID
-```
-
-```
-GET /api/books?category=CATEGORY_ID
-```
+| Field       | Description       |
+| ----------- | ----------------- |
+| credentials | Allow cookies     |
+| status      | active / inactive |
 
 ---
 
-# 🛡️ Middleware
+# 🔄 Complete Application Workflow
 
-### Authentication Middleware
-
-Used to protect routes and verify JWT tokens.
-
-```
-Authorization: Bearer TOKEN
-```
-
-If token is valid → request proceeds
-If invalid → unauthorized response
-
----
-
-# 🧠 Data Models
-
-### User
-
-```
-name
-email
-password
-createdAt
-```
+1. User registers an account
+2. User logs in and receives JWT token
+3. User creates categories
+4. User adds authors
+5. User adds books
+6. User uploads book pages
+7. User updates book status
+8. User marks books as favorite
+9. User retrieves categories, authors, and books
 
 ---
 
-### Category
+# 🔁 CRUD Operations
 
-```
-name
-createdBy
-createdAt
-```
-
----
-
-### Author
-
-```
-name
-createdBy
-createdAt
-```
-
----
-
-### Book
-
-```
-title
-author
-category
-publishedYear
-createdBy
-createdAt
-```
-
----
-
-# 🔁 CRUD Operations Supported
-
-The backend supports full **CRUD operations** for:
-
-- Users (register/login)
-- Categories
-- Authors
-- Books
-
-Operations include:
-
-- Create
-- Read
-- Update
-- Delete
+| Entity     | Create | Read | Update | Delete |
+| ---------- | ------ | ---- | ------ | ------ |
+| Users      | ✅     | ✅   | ❌     | ❌     |
+| Categories | ✅     | ✅   | ✅     | ✅     |
+| Authors    | ✅     | ✅   | ✅     | ✅     |
+| Books      | ✅     | ✅   | ✅     | ✅     |
 
 ---
 
 # ❗ Error Handling
 
-Standard API responses:
+Standard response format.
 
-Success
+### Success
 
 ```
 {
-  "success": true,
-  "data": {}
+ "success":true,
+ "data":{}
 }
 ```
 
-Error
+### Error
 
 ```
 {
-  "success": false,
-  "message": "Error message"
+ "success":false,
+ "message":"Error message"
 }
 ```
 
@@ -572,7 +463,7 @@ Error
 
 # 🧪 API Testing
 
-APIs can be tested using:
+Test APIs using:
 
 - Postman
 - Thunder Client
@@ -582,12 +473,13 @@ APIs can be tested using:
 
 # 📦 Deployment
 
-Example platforms:
+You can deploy this backend on:
 
 - Render
 - Railway
 - AWS
 - DigitalOcean
+- VPS / Docker
 
 ---
 
@@ -602,4 +494,4 @@ https://github.com/yashitag1409
 
 # 📜 License
 
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License**.
