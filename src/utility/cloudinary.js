@@ -1,5 +1,5 @@
 const cloudinary = require("cloudinary").v2;
-const fs = require("fs");
+const streamifier = require("streamifier");
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,24 +7,28 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadToCloudinary = async (localFilePath) => {
-  try {
-    if (!localFilePath) return null;
+const uploadToCloudinary = (fileBuffer, folder = "AksharVault") => {
+  return new Promise((resolve, reject) => {
+    if (!fileBuffer) return resolve(null);
 
-    // Upload the file to Cloudinary
-    const response = await cloudinary.uploader.upload(localFilePath, {
-      resource_type: "auto",
-      folder: "AksharVault/Categories", // Organizes images in your dashboard
-    });
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: "auto",
+      },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return reject(error);
+        }
 
-    // Remove file from local storage after successful upload
-    fs.unlinkSync(localFilePath);
-    return response;
-  } catch (error) {
-    // Remove local file if upload fails to keep server clean
-    if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
-    return null;
-  }
+        console.log("cloudinary response 👇👇👇", result);
+        resolve(result);
+      },
+    );
+
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
 };
 
 module.exports = { uploadToCloudinary };

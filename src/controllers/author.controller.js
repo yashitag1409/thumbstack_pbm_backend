@@ -28,6 +28,8 @@ exports.createAuthor = async (req, res) => {
 exports.getAllAuthors = async (req, res) => {
   try {
     const authors = await AUTHORMODEL.find({ user: req.user._id });
+
+    console.log("authors \n\n", authors);
     res.status(200).json({ status: "success", data: authors });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });

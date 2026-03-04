@@ -24,9 +24,12 @@ exports.getAllCategories = async (req, res) => {
   try {
     const categories = await CATEGORYMODEL.find({
       user: req.user._id,
-    }).populate("books");
+    }).populate("user");
+
+    console.log("categories \n\n", categories);
     res.status(200).json({ status: "success", data: categories });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ status: "error", message: error.message });
   }
 };

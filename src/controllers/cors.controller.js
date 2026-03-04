@@ -112,6 +112,7 @@ module.exports.corsOptions = {
         "http://localhost:5173", // Vite default
         "http://localhost:3000", // React default
         "http://192.168.1.50:3000",
+        "http://192.168.0.207:3000",
       ];
 
       // 2. Handle cases where origin is missing (like Postman or mobile apps)

@@ -20,20 +20,57 @@ module.exports.addNewBook = async (req, res) => {
       isFavorite,
     } = req.body;
 
-    // Validate Required Fields
-    if (!title || (!category && !customCategory) || !description) {
+    if (!title?.trim()) {
       return res.status(400).json({
-        message: "Title, Category, and Description are required.",
         status: "failed",
+        message: "Title is required",
       });
     }
+
+    if (!description?.trim()) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Description is required",
+      });
+    }
+
+    if (!category && !customCategory) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Category or Custom Category is required",
+      });
+    }
+    // for thumbnail
+
     let thumbNailUrl = "";
-    if (req.file) {
-      thumbNailUrl = await uploadToCloudinary(
-        req.file.path,
+
+    if (req.files?.thumbNail) {
+      const uploadedThumb = await uploadToCloudinary(
+        req.files.thumbNail[0].buffer,
         "AksharVault/Books",
       );
+
+      thumbNailUrl = uploadedThumb.secure_url;
     }
+
+    let uploadedPages = [];
+
+    if (req.files?.pageImages) {
+      uploadedPages = await Promise.all(
+        req.files.pageImages.map(async (file, index) => {
+          const uploaded = await uploadToCloudinary(
+            file.buffer,
+            "AksharVault/Books/pages",
+          );
+
+          return {
+            page_url: uploaded.secure_url,
+            page_no: index + 1,
+          };
+        }),
+      );
+    }
+
     const pageCount = req.body.numberOfPages || (pages ? pages.length : 0);
 
     const new_book = await BOOKMODEL.create({
@@ -45,8 +82,8 @@ module.exports.addNewBook = async (req, res) => {
       customAuthor: !author ? customAuthor : null,
       description,
       tags: tags || [],
-      numberOfPages: pageCount,
-      pages: pages || [],
+      pages: uploadedPages || [],
+      numberOfPages: uploadedPages.length || pageCount || 0,
       thumbNail: thumbNailUrl,
       status: status || "want_to_read",
       isFavorite: isFavorite || false,
@@ -102,7 +139,10 @@ module.exports.getAllBooks = async (req, res) => {
 
     if (category) queryObj.category = category; // Filtering by Category ID
     if (status) queryObj.status = status;
-    if (isFavorite) queryObj.isFavorite = isFavorite === "true";
+    // Favourite filter
+    if (isFavorite !== undefined) {
+      queryObj.isFavorite = isFavorite === "true" || isFavorite === true;
+    }
 
     if (search) {
       queryObj.$or = [
@@ -115,14 +155,16 @@ module.exports.getAllBooks = async (req, res) => {
 
     const [books, totalBooks] = await Promise.all([
       BOOKMODEL.find(queryObj)
-        .populate("category", "name") // Transform ID to Category Name
-        .populate("author", "name") // Transform ID to Author Name
+        .populate("category") // Transform ID to Category Name
+        .populate("author") // Transform ID to Author Name
         .populate("user") // Transform ID to Author Name
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit)),
       BOOKMODEL.countDocuments(queryObj),
     ]);
+
+    console.log("books", books);
 
     return res.status(200).json({
       status: "success",
@@ -132,6 +174,7 @@ module.exports.getAllBooks = async (req, res) => {
       data: books,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
@@ -196,17 +239,69 @@ module.exports.updateBook = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
+    //  checking validation
+    if (updateData.title !== undefined && !updateData.title.trim()) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Title cannot be empty",
+      });
+    }
+
+    if (
+      updateData.description !== undefined &&
+      !updateData.description.trim()
+    ) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Description cannot be empty",
+      });
+    }
     // Handle pages/numberOfPages logic if pages are updated
     if (updateData.pages && !updateData.numberOfPages) {
       updateData.numberOfPages = updateData.pages.length;
     }
+    if (req.files?.thumbNail) {
+      console.log("req.files ✅✅✅\n", req.files);
+      console.log(
+        "req.files.thumbNail[0].buffer 👇👇📷📷👇👇\n\n",
+        req.files.thumbNail[0].buffer,
+      );
 
+      const uploadedThumb = await uploadToCloudinary(
+        req.files.thumbNail[0].buffer,
+        "AksharVault/Books",
+      );
+      console.log("uploadedThumb 📷📷\n\n", uploadedThumb);
+
+      updateData.thumbNail = uploadedThumb.secure_url;
+    }
+    // page updates
+    if (req.files?.pageImages) {
+      const uploadedPages = await Promise.all(
+        req.files.pageImages.map(async (file, index) => {
+          const uploaded = await uploadToCloudinary(
+            file.buffer,
+            "AksharVault/Books/pages",
+          );
+
+          return {
+            page_url: uploaded.secure_url,
+            page_no: index + 1,
+          };
+        }),
+      );
+
+      updateData.pages = uploadedPages;
+      updateData.numberOfPages = uploadedPages.length;
+    }
     // Ensure the book belongs to the logged-in user before updating
     const updatedBook = await BOOKMODEL.findOneAndUpdate(
       { _id: id, user: req.user._id },
       { $set: updateData },
       { new: true, runValidators: true },
-    ).populate("category author");
+    );
+    // .populate("category")
+    // .populate("author");
 
     if (!updatedBook) {
       return res.status(404).json({
@@ -221,6 +316,7 @@ module.exports.updateBook = async (req, res) => {
       data: updatedBook,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: "error",
       message: error.message,

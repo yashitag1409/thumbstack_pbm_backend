@@ -16,7 +16,7 @@ const bookSchema = new Schema(
     // Reference to a Category Model
     category: {
       type: Schema.Types.ObjectId,
-      ref: "Category",
+      ref: "category",
       required: false,
     },
     // Fallback if the user types their own category
@@ -27,7 +27,7 @@ const bookSchema = new Schema(
     // Reference to an Author Model
     author: {
       type: Schema.Types.ObjectId,
-      ref: "Author",
+      ref: "author",
       required: false,
     },
     // Fallback if the author isn't in your master list
