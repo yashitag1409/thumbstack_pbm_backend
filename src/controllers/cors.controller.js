@@ -131,7 +131,7 @@ module.exports.corsOptions = {
       console.log("origin", origin);
       if (!origin) {
         console.warn("Blocked request: origin is ", origin);
-        return callback(null, false);
+        return callback(null, true);
       }
       // // 3. Check if origin is a local development URL first
       // if (localOrigins.includes(origin)) {
