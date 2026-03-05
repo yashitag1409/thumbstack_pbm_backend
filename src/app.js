@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const { corsOptions } = require("./controllers/cors.controller");
 
+app.set("trust proxy", 1);
+
 app.use((req, resp, next) => {
   cors(corsOptions)(req, resp, next);
 });
