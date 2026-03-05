@@ -125,10 +125,11 @@ module.exports.corsOptions = {
       // ];
 
       // // 2. Handle cases where origin is missing (Postman/Mobile)
-      // if (!origin) {
-      //   return callback(null, true);
-      // }
-
+      // ❌ Block requests with no origin (Postman, curl, bots)
+      if (!origin) {
+        console.warn("Blocked request: origin is undefined");
+        return callback(null, false);
+      }
       // // 3. Check if origin is a local development URL first
       // if (localOrigins.includes(origin)) {
       //   return callback(null, true);
@@ -146,8 +147,8 @@ module.exports.corsOptions = {
         console.error(
           `Blocked CORS request from unauthorized origin: ${origin}`,
         );
-        callback(
-          new Error(`Security Restriction: Origin ${origin} not authorized.`),
+        return callback(
+          { message: "Unauthorized CORS request", status: "error" },
           false,
         );
       }
