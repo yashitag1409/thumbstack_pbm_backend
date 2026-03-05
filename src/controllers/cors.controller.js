@@ -142,7 +142,7 @@ module.exports.corsOptions = {
       const dbOrigins = await CORSMODEL.find({ status: "active" }).distinct(
         "origin",
       );
-
+      console.log("dbOrigins", dbOrigins);
       // 5. Validation Logic
       if (dbOrigins.includes(origin)) {
         consoel.log("Allowed CORS request from authorized origin:", origin);
