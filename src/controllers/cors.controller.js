@@ -148,7 +148,7 @@ module.exports.corsOptions = {
       console.log("dbOrigins", dbOrigins);
       // 5. Validation Logic
       if (dbOrigins.includes(origin)) {
-        consoel.log("Allowed CORS request from authorized origin:", origin);
+        console.log("Allowed CORS request from authorized origin:", origin);
         callback(null, true);
       } else {
         console.error(
