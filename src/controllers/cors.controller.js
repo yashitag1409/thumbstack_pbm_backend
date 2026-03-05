@@ -121,13 +121,16 @@ module.exports.corsOptions = {
       //   "http://localhost:5173",
       //   "http://127.0.0.1:3000",
       //   "http://127.0.0.1:5173",
-      //   // "http://192.168.0.207:3000",
+      //   "http://192.168.0.207:3000",
+      //   "http://192.168.1.50:3000",
       // ];
 
       // // 2. Handle cases where origin is missing (Postman/Mobile)
       // ❌ Block requests with no origin (Postman, curl, bots)
+
+      console.log("origin", origin);
       if (!origin) {
-        console.warn("Blocked request: origin is undefined");
+        console.warn("Blocked request: origin is ", origin);
         return callback(null, false);
       }
       // // 3. Check if origin is a local development URL first
@@ -142,6 +145,7 @@ module.exports.corsOptions = {
 
       // 5. Validation Logic
       if (dbOrigins.includes(origin)) {
+        consoel.log("Allowed CORS request from authorized origin:", origin);
         callback(null, true);
       } else {
         console.error(
