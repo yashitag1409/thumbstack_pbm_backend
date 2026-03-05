@@ -6,7 +6,7 @@ const { sendMail } = require("../utility/mail/sendmail");
 // register user
 module.exports.registerUser = async (req, resp) => {
   try {
-    console.log("req.body", req.body);
+    // console.log("req.body", req.body);
     const { contact, email, name, countryCode, password } = req.body;
     // check is user exist with entered email
 
@@ -49,7 +49,7 @@ module.exports.registerUser = async (req, resp) => {
       //   data: userResponse, not sending user in data only sending that user is registered successfully
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
