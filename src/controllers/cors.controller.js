@@ -3,8 +3,8 @@ const CORSMODEL = require("../database/model/cors.model");
 module.exports.addOrigin = async (req, resp) => {
   try {
     // console.log(req.body);
-    const { origin } = req.body;
-
+    const { origin, status } = req.body;
+    const userId = req.user._id;
     if (!origin) {
       return resp.status(400).json({ error: "Origin is required." });
     }
@@ -18,6 +18,8 @@ module.exports.addOrigin = async (req, resp) => {
 
     const add_origin = await CORSMODEL.create({
       origin,
+      status: status || "active",
+      addedBy: userId,
     });
 
     if (!add_origin)
@@ -80,10 +82,15 @@ module.exports.deleteOrigin = async (req, resp) => {
 module.exports.updateOrigin = async (req, resp) => {
   try {
     const { id } = req.params;
-    const { origin, credentials } = req.body;
+    const { origin, status } = req.body;
+    const userId = req.user._id;
+
     const update_origin = await CORSMODEL.findOneAndUpdate(
       { _id: id },
-      { $set: { origin } },
+      {
+        $set: { origin, status },
+        $push: { updateHistory: { user: userId } }, // Tracking changes
+      },
       { new: true },
     );
 
@@ -108,25 +115,34 @@ module.exports.updateOrigin = async (req, resp) => {
 module.exports.corsOptions = {
   origin: async (origin, callback) => {
     try {
-      // 1. Handle cases where origin is missing (Optional: Allow Postman/Mobile)
-      // If you want to be extremely strict even for Postman, change this to:
-      // if (!origin) return callback(new Error("Origin required"), false);
-      if (!origin) {
-        return callback(null, true);
-      }
+      // 1. Define Local Development Origins
+      // const localOrigins = [
+      //   "http://localhost:3000",
+      //   "http://localhost:5173",
+      //   "http://127.0.0.1:3000",
+      //   "http://127.0.0.1:5173",
+      //   // "http://192.168.0.207:3000",
+      // ];
 
-      // 2. Fetch ALL authorized origins from MongoDB
-      // We only fetch origins where status is "active" to allow easy revoking
+      // // 2. Handle cases where origin is missing (Postman/Mobile)
+      // if (!origin) {
+      //   return callback(null, true);
+      // }
+
+      // // 3. Check if origin is a local development URL first
+      // if (localOrigins.includes(origin)) {
+      //   return callback(null, true);
+      // }
+
+      // 4. Fetch ALL active authorized origins from MongoDB
       const dbOrigins = await CORSMODEL.find({ status: "active" }).distinct(
         "origin",
       );
 
-      // 3. Validation Logic
-      // We check if the incoming request origin exists in our DB list
+      // 5. Validation Logic
       if (dbOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        // Log the unauthorized attempt for security auditing
         console.error(
           `Blocked CORS request from unauthorized origin: ${origin}`,
         );
@@ -142,5 +158,5 @@ module.exports.corsOptions = {
   },
   credentials: true, // Required for JWT cookies/sessions
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  optionsSuccessStatus: 200, // For legacy browser support
+  optionsSuccessStatus: 200,
 };

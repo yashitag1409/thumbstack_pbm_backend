@@ -25,11 +25,11 @@ router.get("/", (req, res) => {
       "Welcome to aksharVault: the People Book Management System admin route",
   });
 });
-router.post("/add_origin", addOrigin);
+router.post("/add", addOrigin);
 // update origin api
-router.patch("/update_origin/:id", updateOrigin);
+router.patch("/update/:id", updateOrigin);
 
 router.get("/all", getAllOrigins);
-router.delete("/delete_origin/:id", deleteOrigin);
+router.delete("/delete/:id", deleteOrigin);
 
 module.exports = router;
