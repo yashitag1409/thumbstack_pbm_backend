@@ -108,17 +108,13 @@ module.exports.addNewBook = async (req, res) => {
       "AksharVault Admin",
     );
 
-    console.log(
-      "new book added",
-      await new_book.populate("category").populate("author").populate("user"),
-    );
-
     return res.status(201).json({
       message: `"${title}" secured successfully!`,
       status: "success",
       data: new_book,
     });
   } catch (error) {
+    // console.log(error);
     return res.status(500).json({ status: "failed", message: error.message });
   }
 };
@@ -164,8 +160,6 @@ module.exports.getAllBooks = async (req, res) => {
       BOOKMODEL.countDocuments(queryObj),
     ]);
 
-    console.log("books", books);
-
     return res.status(200).json({
       status: "success",
       totalBooks,
@@ -174,7 +168,7 @@ module.exports.getAllBooks = async (req, res) => {
       data: books,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
@@ -193,9 +187,10 @@ module.exports.getSingleBook = async (req, res) => {
       return res
         .status(404)
         .json({ status: "failed", message: "Book not found" });
-
+    // console.log("book", book);
     return res.status(200).json({ status: "success", data: book });
   } catch (error) {
+    // console.log(error);
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
@@ -261,22 +256,24 @@ module.exports.updateBook = async (req, res) => {
       updateData.numberOfPages = updateData.pages.length;
     }
     if (req.files?.thumbNail) {
-      console.log("req.files ✅✅✅\n", req.files);
-      console.log(
-        "req.files.thumbNail[0].buffer 👇👇📷📷👇👇\n\n",
-        req.files.thumbNail[0].buffer,
-      );
-
       const uploadedThumb = await uploadToCloudinary(
         req.files.thumbNail[0].buffer,
         "AksharVault/Books",
       );
-      console.log("uploadedThumb 📷📷\n\n", uploadedThumb);
+      // console.log("uploadedThumb 📷📷\n\n", uploadedThumb);
 
       updateData.thumbNail = uploadedThumb.secure_url;
     }
     // page updates
+    const existingBook = await BOOKMODEL.findOne({
+      _id: id,
+      user: req.user._id,
+    });
+    // ✅ Append Pages instead of replacing
+    // append pages instead of replacing
     if (req.files?.pageImages) {
+      const startPage = existingBook.pages.length;
+
       const uploadedPages = await Promise.all(
         req.files.pageImages.map(async (file, index) => {
           const uploaded = await uploadToCloudinary(
@@ -286,14 +283,16 @@ module.exports.updateBook = async (req, res) => {
 
           return {
             page_url: uploaded.secure_url,
-            page_no: index + 1,
+            page_no: startPage + index + 1, // continue numbering
           };
         }),
       );
 
-      updateData.pages = uploadedPages;
-      updateData.numberOfPages = uploadedPages.length;
+      existingBook.pages.push(...uploadedPages);
+
+      existingBook.numberOfPages = existingBook.pages.length;
     }
+
     // Ensure the book belongs to the logged-in user before updating
     const updatedBook = await BOOKMODEL.findOneAndUpdate(
       { _id: id, user: req.user._id },
@@ -316,7 +315,7 @@ module.exports.updateBook = async (req, res) => {
       data: updatedBook,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({
       status: "error",
       message: error.message,
@@ -346,6 +345,7 @@ module.exports.deleteBook = async (req, res) => {
       message: `"${deletedBook.title}" has been removed from your Vault.`,
     });
   } catch (error) {
+    // console.log(error);
     return res.status(500).json({
       status: "error",
       message: error.message,

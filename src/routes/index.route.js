@@ -5,6 +5,7 @@ const authRoute = require("./auth.route");
 const bookRoute = require("./book.route");
 const categoryRoute = require("./category.route");
 const authorRoute = require("./author.route");
+const adminRoute = require("./admin.route");
 // Root route
 routes.get("/", (req, res) => {
   res.json({
@@ -16,5 +17,6 @@ routes.use("/auth", authRoute);
 routes.use("/authors", authorRoute);
 routes.use("/categories", categoryRoute);
 routes.use("/books", bookRoute);
+routes.use("/admin", adminRoute);
 
 module.exports = routes;

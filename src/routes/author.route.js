@@ -18,7 +18,11 @@ router.post(
   authorController.createAuthor,
 );
 router.get("/all", authorController.getAllAuthors);
-router.patch("/update/:id", authorController.updateAuthor);
+router.patch(
+  "/update/:id",
+  upload.single("profileImage"),
+  authorController.updateAuthor,
+);
 router.delete("/delete/:id", authorController.deleteAuthor);
 
 module.exports = router;

@@ -49,7 +49,7 @@ module.exports.RegisterUser = async (req, resp) => {
       //   data: userResponse, not sending user in data only sending that user is registered successfully
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
@@ -66,9 +66,9 @@ module.exports.loginUserByPassword = async (req, resp) => {
   try {
     const { password, email } = req.body;
 
-    console.log(password, email);
+    // console.log(password, email);
 
-    console.log(req.body);
+    // console.log(req.body);
 
     const user = await USERMODEL.findOne({ email }).select("+password");
 
@@ -94,8 +94,8 @@ module.exports.loginUserByPassword = async (req, resp) => {
     delete userResponse.otp;
     userResponse.token = token;
 
-    console.log("user successfully loggedin \n\n");
-    console.log(userResponse);
+    // console.log("user successfully loggedin \n\n");
+    // console.log(userResponse);
 
     return resp.status(200).json({
       message: "User logged in successfully",
@@ -103,7 +103,7 @@ module.exports.loginUserByPassword = async (req, resp) => {
       user: userResponse,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
@@ -139,7 +139,7 @@ module.exports.sendLoginOtp = async (req, resp) => {
       data: { email },
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
@@ -186,13 +186,16 @@ module.exports.loginUserByOtp = async (req, resp) => {
     delete userResponse.otp;
     userResponse.token = token;
 
+    console.log("user successfully loggedin \n\n");
+    console.log(userResponse);
+
     return resp.status(200).json({
       message: "User logged in successfully",
       status: "success",
       data: userResponse,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
       status: "error",
@@ -227,7 +230,7 @@ module.exports.forgotPassword = async (req, resp) => {
       data: { email },
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
@@ -277,7 +280,7 @@ module.exports.resetPassword = async (req, resp) => {
       status: "success",
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
@@ -292,16 +295,18 @@ module.exports.updateProfile = async (req, resp) => {
   try {
     const userId = req.user._id; // Populated by your protect middleware
     let updateData = { ...req.body };
+    console.log("uypdateData", updateData);
 
     // 1. Check for profile image upload
     if (req.file) {
       // Upload to specific user profile folder
       const imageUrl = await uploadToCloudinary(
-        req.file.path,
+        req.file.buffer,
         "AksharVault/Users/Profiles",
       );
       if (imageUrl) {
-        updateData.profileImage = imageUrl;
+        updateData.profileImage =
+          imageUrl.secure_url ?? updateData.profileImage;
       }
     }
 
@@ -318,6 +323,7 @@ module.exports.updateProfile = async (req, resp) => {
         status: "failed",
       });
     }
+    console.log("updatedUser successfully", updatedUser);
 
     return resp.status(200).json({
       message: "Profile updated successfully",
@@ -325,7 +331,7 @@ module.exports.updateProfile = async (req, resp) => {
       data: updatedUser,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return resp.status(500).json({
       message: error.message || "Internal Server Error",
       status: "error",

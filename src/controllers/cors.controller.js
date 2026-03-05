@@ -2,7 +2,7 @@ const CORSMODEL = require("../database/model/cors.model");
 
 module.exports.addOrigin = async (req, resp) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const { origin } = req.body;
 
     if (!origin) {
@@ -104,41 +104,43 @@ module.exports.updateOrigin = async (req, resp) => {
     });
   }
 };
+
 module.exports.corsOptions = {
   origin: async (origin, callback) => {
     try {
-      // 1. Define your Local Development Origins
-      const localOrigins = [
-        "http://localhost:5173", // Vite default
-        "http://localhost:3000", // React default
-        "http://192.168.1.50:3000",
-        "http://192.168.0.207:3000",
-      ];
-
-      // 2. Handle cases where origin is missing (like Postman or mobile apps)
-      // During development, we usually allow 'no origin'
+      // 1. Handle cases where origin is missing (Optional: Allow Postman/Mobile)
+      // If you want to be extremely strict even for Postman, change this to:
+      // if (!origin) return callback(new Error("Origin required"), false);
       if (!origin) {
         return callback(null, true);
       }
 
-      // 3. Fetch dynamic origins from MongoDB
+      // 2. Fetch ALL authorized origins from MongoDB
+      // We only fetch origins where status is "active" to allow easy revoking
       const dbOrigins = await CORSMODEL.find({ status: "active" }).distinct(
         "origin",
       );
 
-      // 4. Merge Local and DB origins
-      const allAllowedOrigins = [...localOrigins, ...dbOrigins];
-
-      // 5. Check if the incoming origin is in the list
-      if (allAllowedOrigins.includes(origin)) {
+      // 3. Validation Logic
+      // We check if the incoming request origin exists in our DB list
+      if (dbOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+        // Log the unauthorized attempt for security auditing
+        console.error(
+          `Blocked CORS request from unauthorized origin: ${origin}`,
+        );
+        callback(
+          new Error(`Security Restriction: Origin ${origin} not authorized.`),
+          false,
+        );
       }
     } catch (error) {
+      console.error("CORS Middleware Error:", error);
       callback(error, false);
     }
   },
-  credentials: true,
+  credentials: true, // Required for JWT cookies/sessions
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 200, // For legacy browser support
 };

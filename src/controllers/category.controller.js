@@ -22,15 +22,45 @@ exports.createCategory = async (req, res) => {
 // Get All User Categories
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await CATEGORYMODEL.find({
-      user: req.user._id,
-    }).populate("user");
+    const { page = 1, limit = 10, search } = req.query;
 
-    console.log("categories \n\n", categories);
-    res.status(200).json({ status: "success", data: categories });
+    let queryObj = {
+      user: req.user._id,
+    };
+
+    // Search by name or description
+    if (search) {
+      queryObj.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [categories, totalCategories] = await Promise.all([
+      CATEGORYMODEL.find(queryObj)
+        .populate("user")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+
+      CATEGORYMODEL.countDocuments(queryObj),
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      totalCategories,
+      currentPage: Number(page),
+      totalPages: Math.ceil(totalCategories / limit),
+      data: categories,
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: "error", message: error.message });
+    // console.log(error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
   }
 };
 
