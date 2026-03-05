@@ -4,21 +4,40 @@ Backend service for the **AKSHARVAULT: Personal Book Management (PBM) System**.
 
 This API allows users to **register, authenticate, and manage their personal book collection**, including **categories, authors, and books** with full CRUD functionality.
 
----
+---Live API
+Base URL: https://thumbstack-pbm-backend.onrender.com/api/v1
 
-# 🚀 Tech Stack
+Frontend Origin: https://thumbstack-pbm-w286.vercel.app
 
-- **Node.js**
-- **Express.js**
-- **MongoDB**
-- **Mongoose**
-- **JWT Authentication**
-- **REST API Architecture**
-- **Cloudinary (Image Upload)**
-- **Multer (File Upload)**
-- **Nodemailer (Email Service)**
+🛠️ Tech Stack
+Runtime: Node.js
 
----
+Framework: Express.js
+
+Database: MongoDB with Mongoose ODM
+
+Authentication: JWT (JSON Web Tokens)
+
+Media Storage: Cloudinary (via Multer)
+
+Email Service: Nodemailer (for OTP delivery)
+
+🛡️ Security & Role-Based Access (RBAC)
+This project implements strict security layers to protect user data and system integrity.
+
+1. Admin-Only CORS Management
+   The API features a dynamic CORS policy. While localhost is permitted for development, production access is strictly restricted to authorized domains stored in the database.
+
+Restriction: Only users with the admin role can access /api/v1/admin/\* endpoints.
+
+Validation: Role checking is performed at the endpoint level after JWT verification.
+
+2. Authentication Flow
+   Password Login: Traditional Bcrypt-hashed authentication.
+
+OTP Login: 6-digit email verification for passwordless access.
+
+Protected Routes: All library operations require a valid Authorization: Bearer <token> header.
 
 # 📂 Project Structure
 
@@ -430,7 +449,7 @@ Admin can manage allowed origins.
 
 | Entity     | Create | Read | Update | Delete |
 | ---------- | ------ | ---- | ------ | ------ |
-| Users      | ✅     | ✅   | ❌     | ❌     |
+| Users      | ✅     | ✅   | ✅     | ❌     |
 | Categories | ✅     | ✅   | ✅     | ✅     |
 | Authors    | ✅     | ✅   | ✅     | ✅     |
 | Books      | ✅     | ✅   | ✅     | ✅     |
