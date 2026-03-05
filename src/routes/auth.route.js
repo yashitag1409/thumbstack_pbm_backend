@@ -2,11 +2,11 @@ const express = require("express");
 const {
   loginUserByPassword,
   loginUserByOtp,
-  RegisterUser,
   sendLoginOtp,
   forgotPassword,
   resetPassword,
   updateProfile,
+  registerUser,
 } = require("../controllers/auth.controller");
 const {
   registerLimiter,
@@ -26,7 +26,12 @@ router.get("/", (req, res) => {
 });
 
 // register api
-router.post("/register", registerLimiter, RegisterUser);
+router.post(
+  "/register",
+  registerLimiter,
+  upload.single("profileImage"),
+  registerUser,
+);
 // login api password | send otp | login otp
 router.post("/send_login_otp", otpLimiter, sendLoginOtp);
 router.post("/login_otp", loginUserByOtp);
