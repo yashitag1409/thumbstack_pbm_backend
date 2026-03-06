@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 // Verify connection configuration
 transporter.verify((error) => {
-  if (error) console.error("❌ SMTP Connection Failed:", error.message);
+  if (error) console.log("❌ SMTP Connection Failed:", error.message);
   else console.log("✅ SMTP Server is ready for AksharVault");
 });
 
@@ -52,6 +52,7 @@ const sendMail = async (
       status: "failed",
       message: "Error sending email",
       error: error.message,
+      error,
     };
   }
 };

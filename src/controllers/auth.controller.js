@@ -187,7 +187,7 @@ module.exports.loginUserByOtp = async (req, resp) => {
     userResponse.token = token;
 
     console.log("user successfully loggedin \n\n");
-    console.log(userResponse);
+    // console.log(userResponse);
 
     return resp.status(200).json({
       message: "User logged in successfully",
